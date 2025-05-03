@@ -13,8 +13,8 @@
             "display": "none"
         },
         "openapi": [
-            "./openapi/ru",
-            "./openapi/en"
+            "./openapi/ru/openapi.json",
+            "./openapi/en/openapi.json"
         ]
     },
     "navigation": {
