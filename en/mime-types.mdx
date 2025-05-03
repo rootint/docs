@@ -1,0 +1,53 @@
+---
+title: "Supported MIME Types"
+description: "Learn which MIME types are supported by the Nexara API."
+---
+
+The Nexara Speech-to-Text API, particularly the `/audio/transcriptions` endpoint, accepts file uploads with various MIME types representing common audio and video formats.
+
+When sending a file via `multipart/form-data`, ensure the `Content-Type` associated with the file part correctly identifies the format.
+
+Below is a list of the MIME types currently supported by the API and the common formats they represent:
+
+**Audio Formats:**
+
+- **WAV:**
+  - `audio/wav`
+  - `audio/x-wav`
+  - `audio/wave`
+- **MP3:**
+  - `audio/mp3`
+  - `audio/mpeg`
+  - `audio/mpg`
+  - `audio/x-mpeg`
+- **M4A / AAC:**
+  - `audio/x-m4a`
+  - `audio/mp4`
+  - `audio/mp4a-latm`
+  - `audio/mpeg4`
+  - `audio/aac`
+- **FLAC:**
+  - `audio/flac`
+- **OGG (Vorbis/Opus):**
+  - `audio/ogg`
+  - `audio/oga`
+- **Opus:**
+  - `audio/opus`
+- **AIFF:**
+  - `audio/aiff`
+  - `audio/x-aiff`
+- **ASF:**
+  - `audio/asf`
+
+**Video Formats (Audio will be extracted):**
+
+- **MP4:**
+  - `video/mp4`
+- **MOV:**
+  - `video/quicktime`
+- **AVI:**
+  - `video/x-msvideo`
+- **MKV:**
+  - `video/x-matroska`
+
+**Note:** If there is a particular MIME type you wish would be supported, please write to the <a href="https://t.me/RND_RandoM">Support</a> team.

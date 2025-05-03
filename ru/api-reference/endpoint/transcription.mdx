@@ -1,0 +1,26 @@
+---
+title: "Создать транскрибацию"
+openapi: "/openapi/ru/openapi.json POST /audio/transcriptions"
+---
+
+import SpeechToTextSnippetRu from "/snippets/transcription-snippet-ru.mdx";
+
+## Поддерживаемые форматы и ограничения
+
+- **Поддерживаемые форматы:** `mp3`, `wav`, `m4a`, `flac`, `ogg`, `opus`, `mp4`, `mov`, `avi`, `mkv`
+- **Максимальный размер файла:** `1 ГБ`. Если вам нужно больше, напишите в <a href="https://t.me/RND_RandoM">Поддержку</a>
+- **Минимальная длина аудио:** 0.3 секунды.
+- **Максимальная длина аудио:** 10 часов.
+- **Ограничение частоты запросов (Rate limit):** 10 запросов в секунду.
+
+<Tip>
+
+Чтобы сэкономить трафик, рекомендуется конвертировать видеофайлы в аудиоформаты, например, с помощью ffmpeg:
+
+`ffmpeg -i input.mp4 -vn -c:a aac -b:a 192k output.m4a`
+
+В этом примере видеофайл `input.mp4` конвертируется в `output.m4a` с битрейтом 192 кбит/с.
+
+</Tip>
+
+<SpeechToTextSnippetRu />

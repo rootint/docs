@@ -1,0 +1,486 @@
+---
+title: "Быстрый старт"
+description: "Узнайте, как превратить ваше аудио в текст."
+---
+
+API Аудио предоставляет один endpoint для преобразования речи в текст:
+
+- `transcriptions`
+
+Загрузка файлов ограничена 1 ГБ (если вам нужна поддержка файлов большего размера, вы можете написать в <a href="https://t.me/RND_RandoM">Поддержку</a>). Поддерживаются следующие типы файлов: `mp3`, `wav`, `m4a`, `flac`, `ogg`, `opus`, `mp4`, `mov`, `avi` и `mkv`.
+
+## Транскрибация
+
+API транскрибации принимает на вход аудио (или видео) файл, который вы хотите транскрибировать, и желаемый формат вывода. Модель поддерживает следующие форматы вывода (`json`, `text`, `srt`, `verbose_json`, `vtt`). Подробнее о форматах вывода читайте на странице [Форматы ответа](/ru/response-formats).
+
+<CodeGroup>
+
+```python Python requests
+import requests
+
+url = "https://api.nexara.ru/api/v1/audio/transcriptions"
+api_key = "NEXARA_API_KEY"  # Замените своим настоящим ключом
+
+headers = {
+    "Authorization": f"Bearer {api_key}",
+}
+
+file_path = "audio/example.mp3"
+
+with open(file_path, "rb") as audio_file:
+    files = {
+        "file": (file_path, audio_file, "audio/mp3"),  # Поменяйте MIME тип, если нужно
+    }
+
+    response = requests.post(url, headers=headers, files=files)
+
+    transcription = response.json()
+    print(transcription)
+```
+
+```python OpenAI Python
+# Внимание: OpenAI SDK не будет поддерживать
+# весь будущий функционал Nexara.
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.nexara.ru/api/v1",
+    api_key="NEXARA_API_KEY", # Замените своим настоящим ключом
+)
+
+with open("audio/example.mp3", "rb") as audio_file:
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file
+    )
+
+print(transcription)
+```
+
+```javascript JS
+async function transcribeAudio(audioFile, apiKey) {
+  const url = "https://api.nexara.ru/api/v1/audio/transcriptions";
+
+  // Создаем объект FormData для файла
+  const formData = new FormData();
+  formData.append("file", audioFile);
+
+  try {
+    // Выполняем API запрос
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: formData,
+    });
+
+    // Парсим и возвращаем JSON ответ
+    const transcription = await response.json();
+    return transcription;
+  } catch (error) {
+    console.error("Ошибка транскрибации:", error);
+    throw error;
+  }
+}
+
+// Пример использования:
+document
+  .getElementById("fileInput")
+  .addEventListener("change", async (event) => {
+    const apiKey = "NEXARA_API_KEY"; // Замените на ваш актуальный API ключ
+    const audioFile = event.target.files[0];
+
+    try {
+      const result = await transcribeAudio(audioFile, apiKey);
+      console.log(result);
+    } catch (error) {
+      console.error("Ошибка обработки аудио:", error);
+    }
+  });
+```
+
+```bash cURL
+curl --request POST \
+  --url https://api.nexara.ru/api/v1/audio/transcriptions \
+  --header 'Authorization: Bearer NEXARA_API_KEY' \
+  --header 'Content-Type: multipart/form-data' \
+  --form response_format="verbose_json" \
+  --form file="@example.mp3"
+```
+
+</CodeGroup>
+
+По умолчанию тип ответа будет `json`:
+
+```
+{
+  "text": "Восемьдесят семь лет тому назад наши отцы основали на этом континенте новую нацию, зачатую в свободе и посвященную утверждению, что все люди созданы равными.
+...
+}
+```
+
+## Поддерживаемые языки
+
+В настоящее время мы поддерживаем следующие языки через endpoint `/transcriptions`:
+
+Африкаанс, Арабский, Армянский, Азербайджанский, Белорусский, Боснийский, Болгарский, Каталанский, Китайский, Хорватский, Чешский, Датский, Нидерландский, Английский, Эстонский, Финский, Французский, Галисийский, Немецкий, Греческий, Иврит, Хинди, Венгерский, Исландский, Индонезийский, Итальянский, Японский, Каннада, Казахский, Корейский, Латышский, Литовский, Македонский, Малайский, Маратхи, Маори, Непальский, Норвежский, Персидский, Польский, Португальский, Румынский, Русский, Сербский, Словацкий, Словенский, Испанский, Суахили, Шведский, Тагальский, Тамильский, Тайский, Турецкий, Украинский, Урду, Вьетнамский и Валлийский.
+
+Хотя модель была обучена на 98 языках, список выше содержит только языки, у которых к Word Error Rate (WER) не превысил 50%. Полный список языков и их кодов в формате ISO-639-1 смотрите на странице [Supported Languages](/ru/languages).
+
+## Временные метки
+
+Чтобы получить временные метки вместе с результатом, вы можете использовать параметр `timestamp_granularities[]`. Для того, чтобы использовать эту функцию, установите `verbose_json` в параметре `response_format`. Для получения более подробной информации посетите [Документацию API](/ru/api-reference/endpoint/transcription#body-timestamp-granularities).
+
+В настоящее время доступны два уровня детализации временных меток:
+
+1. **Уровень `segment`:**
+
+   - **Как запросить:** Добавьте параметр `timestamp_granularities[]='segment'` в API-запрос вместе с `response_format='verbose_json'`.
+   - **Что возвращается:** В ответе формата `verbose_json` будет массив `segments`. Каждый элемент этого массива представляет собой 30-секундный фрагмент аудио и содержит:
+     - время начала (`start`),
+     - время окончания (`end`),
+     - транскрибированный текст (`text`) для данного сегмента.
+
+2. **Уровень `word`:**
+   - **Как запросить:** Добавьте `timestamp_granularities[]='word'` в запрос (также с `response_format='verbose_json'`).
+   - **Что возвращается:** Это самый подробный уровень временных меток. В ответе вы получите:
+     - Массив `words`, где каждый объект содержит отдельное слово с точными временами начала (`start`) и окончания (`end`) в секундах.
+     - Массив `segments`, как и при сегментной детализации. Даже если вы запрашиваете уровень `word`, структура `segments` всё равно включается в ответ — это позволяет получить как точные метки слов, так и более широкие сегменты в одном ответе.
+
+**В итоге:**
+
+- Используйте `segment`, если вам нужно примерное разбиение по времени.
+- Используйте `word`, если вам нужны точные времена начала/конца для отдельных слов. Запрос гранулярности `word` удобно предоставляет как массив `words`, так и массив `segments`.
+- Помните, что для обоих вариантов нужен `response_format='verbose_json'`.
+
+<CodeGroup>
+
+```python Python requests
+import requests
+
+url = "https://api.nexara.ru/api/v1/audio/transcriptions"
+api_key = "NEXARA_API_KEY"  # Замените своим настоящим ключом
+
+headers = {
+    "Authorization": f"Bearer {api_key}",
+}
+
+file_path = "audio/example.mp3"
+
+with open(file_path, "rb") as audio_file:
+    files = {
+        "file": (file_path, audio_file, "audio/mp3"),  # Поменяйте MIME тип, если нужно
+    }
+    data = {
+        "response_format": "verbose_json",
+        "timestamp_granularities[]": "word", # Возвращает временные метки
+    }
+
+    response = requests.post(url, headers=headers, files=files, data=data)
+
+    transcription = response.json()
+    print(transcription)
+```
+
+```python OpenAI Python
+# Внимание: OpenAI SDK не будет поддерживать
+# весь будущий функционал Nexara.
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.nexara.ru/api/v1",
+    api_key="NEXARA_API_KEY", # Замените своим настоящим ключом
+)
+
+with open("audio/example.mp3", "rb") as audio_file:
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file,
+        response_format="verbose_json",
+        timestamp_granularities=["word"]
+    )
+
+print(transcription)
+```
+
+```javascript JS
+async function transcribeAudio(audioFile, apiKey) {
+  const url = "https://api.nexara.ru/api/v1/audio/transcriptions";
+
+  // Создаем объект FormData для файла
+  const formData = new FormData();
+  formData.append("file", audioFile);
+
+  formData.append("response_format", "verbose_json");
+  formData.append("timestamp_granularities[]", "word"); // Временные метки
+
+  try {
+    // Выполняем API запрос
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: formData,
+    });
+
+    // Парсим и возвращаем JSON ответ
+    const transcription = await response.json();
+    return transcription;
+  } catch (error) {
+    console.error("Ошибка транскрибации:", error);
+    throw error;
+  }
+}
+
+// Пример использования:
+document
+  .getElementById("fileInput")
+  .addEventListener("change", async (event) => {
+    const apiKey = "NEXARA_API_KEY"; // Замените на ваш актуальный API ключ
+    const audioFile = event.target.files[0];
+
+    try {
+      const result = await transcribeAudio(audioFile, apiKey);
+      console.log(result);
+    } catch (error) {
+      console.error("Ошибка обработки аудио:", error);
+    }
+  });
+```
+
+```bash cURL
+curl --request POST \
+  --url https://api.nexara.ru/api/v1/audio/transcriptions \
+  --header 'Authorization: Bearer NEXARA_API_KEY' \
+  --header 'Content-Type: multipart/form-data' \
+  --form response_format="verbose_json" \
+  --form 'timestamp_granularities[]="word"' \
+  --form file="@example.mp3"
+```
+
+</CodeGroup>
+
+Пример вывода:
+
+```json [expandable]
+{
+  "duration": 109.69609977324264,
+  "language": "en",
+  "task": "transcribe",
+  "text": "Four score and seven years ago, our fathers brought forth on this continent a new nation, conceived in liberty and dedicated to the proposition that all men are created equal. ... ",
+  "words": [
+    {
+      "end": 0.62,
+      "prob": 0.07,
+      "start": 0,
+      "word": "Four"
+    },
+    {
+      "end": 1.12,
+      "prob": 0.21,
+      "start": 0.62,
+      "word": "score"
+    },
+    {
+      "end": 1.44,
+      "prob": 0.84,
+      "start": 1.12,
+      "word": "and"
+    },
+    {
+      "end": 1.82,
+      "prob": 0.95,
+      "start": 1.44,
+      "word": "seven"
+    },
+    {
+      "end": 2.18,
+      "prob": 0.99,
+      "start": 1.82,
+      "word": "years"
+    },
+    {
+      "end": 3.54,
+      "prob": 0.68,
+      "start": 2.18,
+      "word": "ago,"
+    },
+    {
+      "end": 3.84,
+      "prob": 0.94,
+      "start": 3.54,
+      "word": "our"
+    },
+    {
+      "end": 4.16,
+      "prob": 0.46,
+      "start": 3.84,
+      "word": "fathers"
+    },
+    {
+      "end": 4.52,
+      "prob": 0.97,
+      "start": 4.16,
+      "word": "brought"
+    },
+    {
+      "end": 4.94,
+      "prob": 0.97,
+      "start": 4.52,
+      "word": "forth"
+    },
+    {
+      "end": 5.16,
+      "prob": 0.92,
+      "start": 4.94,
+      "word": "on"
+    },
+    {
+      "end": 5.28,
+      "prob": 0.77,
+      "start": 5.16,
+      "word": "this"
+    },
+    {
+      "end": 5.64,
+      "prob": 0.93,
+      "start": 5.28,
+      "word": "continent"
+    },
+    {
+      "end": 6.12,
+      "prob": 0.82,
+      "start": 5.64,
+      "word": "a"
+    },
+    {
+      "end": 6.18,
+      "prob": 0.98,
+      "start": 6.12,
+      "word": "new"
+    },
+    {
+      "end": 7.94,
+      "prob": 0.75,
+      "start": 6.18,
+      "word": "nation,"
+    },
+    {
+      "end": 8.16,
+      "prob": 0.98,
+      "start": 7.94,
+      "word": "conceived"
+    },
+    {
+      "end": 8.46,
+      "prob": 0.95,
+      "start": 8.16,
+      "word": "in"
+    },
+    {
+      "end": 8.8,
+      "prob": 0.98,
+      "start": 8.46,
+      "word": "liberty"
+    },
+    {
+      "end": 9.64,
+      "prob": 0.43,
+      "start": 8.8,
+      "word": "and"
+    },
+    {
+      "end": 10.02,
+      "prob": 1,
+      "start": 9.64,
+      "word": "dedicated"
+    },
+    {
+      "end": 10.64,
+      "prob": 0.96,
+      "start": 10.02,
+      "word": "to"
+    },
+    {
+      "end": 10.86,
+      "prob": 1,
+      "start": 10.64,
+      "word": "the"
+    },
+    {
+      "end": 11.32,
+      "prob": 0.98,
+      "start": 10.86,
+      "word": "proposition"
+    },
+    {
+      "end": 11.78,
+      "prob": 1,
+      "start": 11.32,
+      "word": "that"
+    },
+    {
+      "end": 11.88,
+      "prob": 0.91,
+      "start": 11.78,
+      "word": "all"
+    },
+    {
+      "end": 12.1,
+      "prob": 0.99,
+      "start": 11.88,
+      "word": "men"
+    },
+    {
+      "end": 12.4,
+      "prob": 0.98,
+      "start": 12.1,
+      "word": "are"
+    },
+    {
+      "end": 12.68,
+      "prob": 0.98,
+      "start": 12.4,
+      "word": "created"
+    },
+    {
+      "end": 14.68,
+      "prob": 0.95,
+      "start": 12.68,
+      "word": "equal."
+    }
+  ],
+  "segments": [
+    {
+      "avg_logprob": -1,
+      "compression_ratio": 2.4,
+      "end": 29,
+      "id": 0,
+      "no_speech_prob": 0.5,
+      "seek": 0,
+      "start": 0,
+      "temperature": 1,
+      "text": "Four score and seven years ago, our fathers brought forth on this continent a new nation, conceived in liberty and dedicated to the proposition that all men are created equal. ...",
+      "tokens": [
+        7451, 6175, 293, 3407, 924, 2057, 11, 527, 23450, 3038, 5220, 322, 341,
+        18932, 257, 777, 4790, 11, 34898, 294, 22849, 293, 8374, 281, 264,
+        24830, 300, 439, 1706, 366, 2942, 2681, 13, 823, 321, 366, 8237
+      ]
+    }
+  ]
+}
+```
+
+## Форматы ответа
+
+API транскрипции Nexara позволяет указать формат, в котором вы можете получить результаты. Используя параметр `response_format` в вашем запросе, вы можете настроить вывод так, чтобы он наилучшим образом соответствовал вашим потребностям, будь то простой текст, структурированные данные или готовые к использованию файлы субтитров. Примеры смотрите в [документации API](/ru/api-reference/endpoint/transcription).
+
+API поддерживает следующие форматы вывода:
+
+- **`json`:** Возвращает стандартный JSON-объект, содержащий транскрибированный текст.
+- **`text`:** Возвращает транскрипцию в виде одной строки простого текста.
+- **`verbose_json`:** Возвращает подробный JSON-объект, содержащий текст, язык, продолжительность, а также, возможно, временные метки на уровне сегментов и слов (если запрошено через `timestamp_granularities[]`).
+- **`srt`:** Возвращает транскрипцию, отформатированную как файл субтитров SRT.
+- **`vtt`:** Возвращает транскрипцию, отформатированную как файл субтитров WebVTT.

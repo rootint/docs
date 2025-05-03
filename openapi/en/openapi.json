@@ -1,0 +1,602 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Nexara Speech-to-text API",
+        "description": "Nexara API for audio transcription, speaker diarization and subtitle generation.",
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://api.nexara.ru/api/v1"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "paths": {
+        "/models": {
+            "get": {
+                "summary": "List available models",
+                "operationId": "listModels",
+                "responses": {
+                    "200": {
+                        "description": "A list of available models",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "object": {
+                                            "type": "string",
+                                            "example": "list"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "whisper-1"
+                                                    },
+                                                    "object": {
+                                                        "type": "string",
+                                                        "example": "model"
+                                                    },
+                                                    "created": {
+                                                        "type": "integer",
+                                                        "example": 1686935002
+                                                    },
+                                                    "owned_by": {
+                                                        "type": "string",
+                                                        "example": "nexara"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/models/{model}": {
+            "get": {
+                "summary": "Retrieve a model",
+                "operationId": "getModel",
+                "parameters": [
+                    {
+                        "name": "model",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the model to retrieve",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The model details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "example": "whisper-1"
+                                        },
+                                        "object": {
+                                            "type": "string",
+                                            "example": "model"
+                                        },
+                                        "created": {
+                                            "type": "integer",
+                                            "example": 1686935002
+                                        },
+                                        "owned_by": {
+                                            "type": "string",
+                                            "example": "nexara"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Model not found"
+                    }
+                }
+            }
+        },
+        "/audio/transcriptions": {
+            "post": {
+                "tags": [
+                    "Audio"
+                ],
+                "summary": "Transcribes audio",
+                "description": "Transcribes audio from a given audio file.",
+                "operationId": "create_transcription_audio_transcriptions_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TranscriptionFormDataRequest"
+                            },
+                            "encoding": {
+                                "timestamp_granularities": {
+                                    "style": "form",
+                                    "explode": false
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful transcription or diarization response. The format depends on the 'response_format' parameter.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TranscriptionResponseJson"
+                                },
+                                "examples": {
+                                    "verbose_json_example": {
+                                        "value": {
+                                            "task": "transcribe",
+                                            "language": "en",
+                                            "duration": 9.12,
+                                            "text": "The beach was a popular spot on a hot summer day. People were swimming in the ocean, building sandcastles, and playing beach volleyball.",
+                                            "segments": [
+                                                {
+                                                    "id": 0,
+                                                    "seek": 0,
+                                                    "start": 0.0,
+                                                    "end": 3.319999933242798,
+                                                    "text": "The beach was a popular spot on a hot summer day.",
+                                                    "tokens": [
+                                                        50364,
+                                                        440,
+                                                        7534,
+                                                        390,
+                                                        257,
+                                                        3743,
+                                                        4008,
+                                                        322,
+                                                        257,
+                                                        2368,
+                                                        4266,
+                                                        786,
+                                                        13,
+                                                        50530
+                                                    ],
+                                                    "temperature": 0.0,
+                                                    "avg_logprob": 0.0,
+                                                    "compression_ratio": 0.0,
+                                                    "no_speech_prob": 0.0
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "json_example": {
+                                        "value": {
+                                            "text": "Hello World."
+                                        }
+                                    }
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "Speaker 1: Hello. Speaker 2: World."
+                                }
+                            },
+                            "application/srt": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "srt",
+                                    "example": "1\n00:00:00,500 --> 00:00:01,800\n[SPEAKER_01] Здравствуйте.\n\n2\n00:00:02,100 --> 00:00:03,000\n[SPEAKER_02] Мир.\n\n"
+                                }
+                            },
+                            "application/vtt": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "vtt",
+                                    "example": "WEBVTT\n\n00:00:00.500 --> 00:00:01.800\n<v SPEAKER_01>Здравствуйте.</v>\n\n00:00:02.100 --> 00:00:03.000\n<v SPEAKER_02>Мир.</v>\n\n"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Client-side error due to invalid input, unsupported options, minimum duration not met, or incompatible parameters.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorDetail"
+                                },
+                                "examples": {
+                                    "invalid_audio_file": {
+                                        "summary": "Error Processing Audio",
+                                        "value": {
+                                            "detail": "Error processing audio file: Invalid format"
+                                        }
+                                    },
+                                    "unsupported_language": {
+                                        "summary": "Unsupported Language",
+                                        "value": {
+                                            "detail": "Language 'xx' is not supported. See the list of supported languages at [Your English Docs URL]."
+                                        }
+                                    },
+                                    "unsupported_response_format": {
+                                        "summary": "Unsupported Response Format",
+                                        "value": {
+                                            "detail": "Response format 'xml' is not supported. Supported formats: ['json', 'text', 'verbose_json', 'srt', 'vtt']."
+                                        }
+                                    },
+                                    "diarization_too_short": {
+                                        "summary": "Audio Too Short for Diarization",
+                                        "value": {
+                                            "detail": "Minimum audio duration for diarization is 3 seconds."
+                                        }
+                                    },
+                                    "audio_too_short": {
+                                        "summary": "Audio Too Short (General)",
+                                        "value": {
+                                            "detail": "Minimum audio duration is 0.3 seconds."
+                                        }
+                                    },
+                                    "unsupported_task": {
+                                        "summary": "Unsupported Task",
+                                        "value": {
+                                            "detail": "Task 'summarize' is not supported. Supported tasks: ['transcribe', 'diarize']."
+                                        }
+                                    },
+                                    "unsupported_diarization_format": {
+                                        "summary": "Unsupported Format for Diarization",
+                                        "value": {
+                                            "detail": "Response format 'text' is not supported with diarization. Supported formats: ['json', 'verbose_json', 'srt', 'vtt']."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Missing or invalid Bearer token.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorDetail"
+                                },
+                                "examples": {
+                                    "invalid_token": {
+                                        "summary": "Invalid Token",
+                                        "value": {
+                                            "detail": "Authentication credentials were not provided or are invalid."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "402": {
+                        "description": "Payment Required - Insufficient funds in the account to process the request.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorDetail"
+                                },
+                                "examples": {
+                                    "insufficient_funds": {
+                                        "summary": "Insufficient Funds",
+                                        "value": {
+                                            "detail": "Insufficient funds in the account."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error - The request body is syntactically correct but semantically incorrect (e.g., missing required form field, incorrect data type).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate Limit Exceeded - Too many requests sent in a given amount of time.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorDetail"
+                                },
+                                "examples": {
+                                    "rate_limit": {
+                                        "summary": "Rate Limited",
+                                        "value": {
+                                            "detail": "Rate limit exceeded"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "TranscriptionFormDataRequest": {
+                "type": "object",
+                "required": [
+                    "file"
+                ],
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",
+                        "description": "The audio file object (not filename) to transcribe, in one of the supported formats."
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "ID of the model to use. Only `whisper-1` is currently available.",
+                        "default": "whisper-1",
+                        "example": "whisper-1"
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "The language of the input audio (ISO-639-1 format). Auto-detected if omitted.",
+                        "nullable": true,
+                        "example": "ru"
+                    },
+                    "response_format": {
+                        "type": "string",
+                        "description": "The format of the transcript output. `srt` and `vtt` formats will return ready-to-use formatted subtitles.",
+                        "enum": [
+                            "json",
+                            "text",
+                            "srt",
+                            "verbose_json",
+                            "vtt"
+                        ],
+                        "default": "json",
+                        "example": "verbose_json"
+                    },
+                    "task": {
+                        "type": "string",
+                        "description": "The task to perform. Currently only 'transcribe' is supported.",
+                        "enum": [
+                            "transcribe"
+                        ],
+                        "default": "transcribe",
+                        "example": "transcribe"
+                    },
+                    "timestamp_granularities[]": {
+                        "type": "string",
+                        "enum": [
+                            "segment",
+                            "word"
+                        ],
+                        "description": "Timestamp granularities to include. `word` requires `response_format` to be `verbose_json`.",
+                        "default": "segment",
+                        "example": "segment"
+                    }
+                }
+            },
+            "TranscriptionSegment": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "Unique ID of the segment.",
+                        "type": "integer"
+                    },
+                    "seek": {
+                        "description": "Seek offset of the segment.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "start": {
+                        "description": "Start time of the segment in seconds.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "end": {
+                        "description": "End time of the segment in seconds.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "text": {
+                        "description": "Text content of the segment.",
+                        "type": "string"
+                    },
+                    "tokens": {
+                        "description": "Array of token IDs for the text content.",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "temperature": {
+                        "description": "Currently a placeholder to keep compatibility with the OpenAI packages.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "avg_logprob": {
+                        "description": "Currently a placeholder to keep compatibility with the OpenAI packages.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "compression_ratio": {
+                        "description": "Currently a placeholder to keep compatibility with the OpenAI packages.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "no_speech_prob": {
+                        "description": "Currently a placeholder to keep compatibility with the OpenAI packages.",
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "required": [
+                    "id",
+                    "seek",
+                    "start",
+                    "end",
+                    "text",
+                    "tokens",
+                    "temperature",
+                    "avg_logprob",
+                    "compression_ratio",
+                    "no_speech_prob"
+                ]
+            },
+            "TranscriptionWord": {
+                "type": "object",
+                "properties": {
+                    "word": {
+                        "description": "The word itself.",
+                        "type": "string"
+                    },
+                    "start": {
+                        "description": "Start time of the word in seconds.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "end": {
+                        "description": "End time of the word in seconds.",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "prob": {
+                        "description": "Confidence level (probability) that the recognized word is accurate.",
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "required": [
+                    "word",
+                    "start",
+                    "end",
+                    "prob"
+                ]
+            },
+            "TranscriptionResponseJson": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "description": "The full transcribed text.",
+                        "type": "string"
+                    },
+                    "task": {
+                        "description": "The task that was performed. Currently, always returns `transcribe`.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "language": {
+                        "description": "The language of the input audio.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "duration": {
+                        "description": "The duration of the input audio.",
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "segments": {
+                        "description": "Segments of the transcribed text and their details.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TranscriptionSegment"
+                        },
+                        "nullable": true
+                    },
+                    "words": {
+                        "description": "Extracted words and their corresponding timestamps.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TranscriptionWord"
+                        },
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "text"
+                ]
+            },
+            "ErrorDetail": {
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "type": "string",
+                        "description": "Error message detail"
+                    }
+                },
+                "required": [
+                    "detail"
+                ]
+            },
+            "ValidationError": {
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "properties": {
+                    "loc": {
+                        "type": "array",
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        }
+                    },
+                    "msg": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            },
+            "HTTPValidationError": {
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "description": "Use your API key as a Bearer token in the Authorization header. Example: `Authorization: Bearer nx-yourkey`"
+            }
+        }
+    }
+}

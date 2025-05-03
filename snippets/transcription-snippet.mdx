@@ -1,0 +1,66 @@
+<RequestExample>
+```curl n8n cURL
+# Import this cURL into the HTTP Request node
+# and add a n8n Binary File
+curl --request POST \
+  --url https://api.nexara.ru/api/v1/audio/transcriptions \
+  --header 'Authorization: Bearer NEXARA_API_KEY' \
+  --header 'Content-Type: multipart/form-data'
+```
+
+```python Python requests
+import requests
+
+url = "https://api.nexara.ru/api/v1/audio/transcriptions"
+api_key = "NEXARA_API_KEY"  # Replace with your full API key
+
+headers = {
+    "Authorization": f"Bearer {api_key}",
+}
+
+file_path = "audio/example.mp3"
+
+with open(file_path, "rb") as audio_file:
+    files = {
+        "file": (file_path, audio_file, "audio/mp3"),  # Change MIME type if needed
+    }
+    data = {
+        "response_format": "verbose_json",
+    }
+
+    response = requests.post(url, headers=headers, files=files, data=data)
+
+    transcription = response.json()
+    print(transcription)
+```
+
+```python OpenAI Python
+# Warning: OpenAI SDK will not support future features of Nexara.
+# Use with caution.
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.nexara.ru/api/v1",
+    api_key="NEXARA_API_KEY", # Replace with your full API key
+)
+
+with open("audio/example.mp3", "rb") as audio_file:
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file,
+        response_format="verbose_json",
+    )
+
+print(transcription)
+```
+
+```bash cURL
+curl --request POST \
+  --url https://api.nexara.ru/api/v1/audio/transcriptions \
+  --header 'Authorization: Bearer NEXARA_API_KEYm' \
+  --header 'Content-Type: multipart/form-data' \
+  --form response_format="verbose_json" \
+  --form file="@example.mp3"
+```
+
+</RequestExample>

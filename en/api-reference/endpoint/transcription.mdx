@@ -1,0 +1,24 @@
+---
+title: 'Create Transcription'
+openapi: '/openapi/en/openapi.json POST /audio/transcriptions'
+---
+
+import SpeechToTextSnippet from "/snippets/transcription-snippet.mdx";
+
+## Supported Formats and Limitations
+- **Supported formats:** `mp3`, `wav`, `mp3`, `m4a`, `flac`, `ogg`, `opus`, `mp4`, `mov`, `avi`, `mkv`
+- **Maximum file size:** `1GB`. If you need more, write to <a href="https://t.me/RND_RandoM">Support</a>.
+- **Minimum audio length:** 0.3 seconds.
+- **Maximum audio length:** 10 hours.
+- **Rate limit:** 10 requests per second.
+
+<Tip>
+
+To save bandwidth, it is recommended to convert video files to audio formats, for example using ffmpeg:
+
+`ffmpeg -i input.mp4 -vn -c:a aac -b:a 192k output.m4a`
+
+In this example, the video file `input.mp4` is converted to `output.m4a` with a bitrate of 192 kbps.
+</Tip>
+
+<SpeechToTextSnippet/>

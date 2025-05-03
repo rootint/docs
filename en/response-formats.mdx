@@ -1,0 +1,14 @@
+---
+title: "Response Formats"
+description: "Learn which response formats you can expect from the Nexara API."
+---
+
+The Nexara Transcription API allows you to specify the format in which you want to receive the transcription results. By using the `response_format` parameter in your request, you can tailor the output to best suit your needs, whether you require simple text, structured data, or ready-to-use subtitle files. Choosing `srt` or `vtt` provides more than timed text; these formats deliver beautifully crafted subtitles, automatically optimized for comfortable on-screen reading and pacing. Refer to the [API Documentation](/en/api-reference/endpoint/transcription) for examples. 
+
+The API supports the following output formats:
+
+- **`json`:** Returns a standard JSON object containing the transcribed text.
+- **`text`:** Returns the transcription as a single plain text string.
+- **`verbose_json`:** Returns a detailed JSON object containing the text, language, duration, and potentially segment and word-level timestamps (if requested via `timestamp_granularities[]`).
+- **`srt`:** Returns the transcription formatted as an SRT subtitle file.
+- **`vtt`:** Returns the transcription formatted as a WebVTT subtitle file.

@@ -1,0 +1,40 @@
+---
+title: "n8n Guide"
+description: "Learn how to use the Nexara API in your n8n pipeline."
+---
+
+Here's a quick guide to integrate the Nexara Transcription API with n8n:
+
+1.  **Add HTTP Request Node:**
+    Search for and add the **HTTP Request** node to your n8n workflow.
+
+    ![Search for HTTP Request Node](/images/n8n.jpg)
+
+2.  **Import cURL Command:**
+    Click the "Import cURL" option within the HTTP Request node. Paste the following command, making sure to **replace `YOUR_NEXARA_API_KEY` with your actual Nexara API key**:
+
+    ```bash
+    curl --request POST \
+    --url https://api.nexara.ru/api/v1/audio/transcriptions \
+    --header 'Authorization: Bearer YOUR_NEXARA_API_KEY' \
+    --header 'Content-Type: multipart/form-data'
+    ```
+
+3.  **Configure Body Parameters:**
+
+    - Scroll down to the **Body** section of the node's parameters.
+    - Ensure **Body Content Type** is set to `Form-Data`.
+    - Under **Body Parameters**, click "Add Parameter".
+    - Set the **Parameter Type** to `n8n Binary File`.
+    - Set the **Name** field to `file`.
+    - Set the **Input Data Field Name** to `data`. _(This assumes the binary file data from a previous node, like "Read Binary File", is available under the `data` field. Adjust if your field name is different.)_
+
+    ![Configure Body Parameters for File](/images/binary.jpg)
+
+4.  **Done! (Add Optional Parameters):**
+    Your basic setup is complete! The node will now send the file for transcription.
+
+    - To add other API parameters (like `language`, or `response_format`), add more parameters under **Body Parameters**, typically using `String` as the **Parameter Type**. Like this: ![Configure Body Parameters](/images/other.jpg)
+    - Make sure a node _before_ this HTTP Request node reads your audio file and makes its binary data available (usually in the `data` field).
+
+    For details on all available API parameters, please refer to the [API Documentation](/en/api-reference/endpoint/transcription).
