@@ -17,6 +17,14 @@
             "./openapi/en/openapi.json"
         ]
     },
+    "contextual": {
+        "options": [
+            "copy",
+            "view",
+            "chatgpt",
+            "claude"
+        ]
+    },
     "navigation": {
         "languages": [
             {
@@ -25,7 +33,7 @@
                     {
                         "tab": "Documentation",
                         "groups": [
-                            { 
+                            {
                                 "group": "Get Started",
                                 "pages": [
                                     "en/quickstart",
