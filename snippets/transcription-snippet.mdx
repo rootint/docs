@@ -59,10 +59,9 @@ print(transcription)
 ```bash cURL
 curl --request POST \
   --url https://api.nexara.ru/api/v1/audio/transcriptions \
-  --header 'Authorization: Bearer NEXARA_API_KEYm' \
-  --header 'Content-Type: multipart/form-data' \
-  --form response_format="verbose_json" \
-  --form file="@example.mp3"
+  --header "Authorization: Bearer $NEXARA_API_KEY" \
+  --header "Content-Type: multipart/form-data" \
+  --form url="https://upload.wikimedia.org/wikipedia/commons/a/a1/Gettysburg_by_Britton.ogg"
 ```
 
 </RequestExample>
