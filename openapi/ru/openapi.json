@@ -341,14 +341,18 @@
         "schemas": {
             "TranscriptionFormDataRequest": {
                 "type": "object",
-                "required": [
-                    "file"
-                ],
                 "properties": {
                     "file": {
                         "type": "string",
                         "format": "binary",
-                        "description": "Объект аудиофайла (не имя файла) для транскрибации, в одном из поддерживаемых форматов."
+                        "nullable": true,
+                        "description": "Объект аудиофайла (не имя файла) для транскрибации, в одном из поддерживаемых форматов. Обязательно должен быть отправлен `file` или  `url` в запросе."
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Gettysburg_by_Britton.ogg",
+                        "nullable": true,
+                        "description": "Ссылка на аудиофайл, в одном из поддерживаемых форматов. Эта опция не поддерживается OpenAI SDK. Обязательно должен быть отправлен `file` или  `url` в запросе."
                     },
                     "model": {
                         "type": "string",

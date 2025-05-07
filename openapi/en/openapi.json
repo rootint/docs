@@ -342,14 +342,18 @@
         "schemas": {
             "TranscriptionFormDataRequest": {
                 "type": "object",
-                "required": [
-                    "file"
-                ],
                 "properties": {
                     "file": {
                         "type": "string",
                         "format": "binary",
-                        "description": "The audio file object (not filename) to transcribe, in one of the supported formats."
+                        "nullable": true,
+                        "description": "The audio file object (not filename) to transcribe, in one of the supported formats. Either `file` or `url` must be sent."
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Gettysburg_by_Britton.ogg",
+                        "nullable": true,
+                        "description": "The URL of the audio file to transcribe, in one of the supported formats. This option is unsupported by the OpenAI SDK. Either `file` or `url` must be sent."
                     },
                     "model": {
                         "type": "string",

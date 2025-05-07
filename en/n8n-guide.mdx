@@ -25,7 +25,7 @@ Here's a quick guide to integrate the Nexara Transcription API with n8n:
     - Scroll down to the **Body** section of the node's parameters.
     - Ensure **Body Content Type** is set to `Form-Data`.
     - Under **Body Parameters**, click "Add Parameter".
-    - Set the **Parameter Type** to `n8n Binary File`.
+    - Set the **Parameter Type** to `n8n Binary File`. _However, if you have the link to the file, just send the link to the file as a `url` parameter to the API._
     - Set the **Name** field to `file`.
     - Set the **Input Data Field Name** to `data`. _(This assumes the binary file data from a previous node, like "Read Binary File", is available under the `data` field. Adjust if your field name is different.)_
 
@@ -35,6 +35,6 @@ Here's a quick guide to integrate the Nexara Transcription API with n8n:
     Your basic setup is complete! The node will now send the file for transcription.
 
     - To add other API parameters (like `language`, or `response_format`), add more parameters under **Body Parameters**, typically using `String` as the **Parameter Type**. Like this: ![Configure Body Parameters](/images/other.jpg)
-    - Make sure a node _before_ this HTTP Request node reads your audio file and makes its binary data available (usually in the `data` field).
+    - Make sure a node _before_ this HTTP Request node reads your audio file and makes its binary data available (usually in the `data` field). Or just send the link to the audio file using the `url` parameter.
 
     For details on all available API parameters, please refer to the [API Documentation](/en/api-reference/endpoint/transcription).
