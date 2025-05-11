@@ -1,13 +1,13 @@
 ---
 title: "Quickstart"
-description: "Learn how to turn your audio into text."
+description: "Learn how to turn your audio into text. Hint: you can copy the entire docs page into ChatGPT by pressing the button above."
 ---
 
 The Audio API provides a single speech to text endpoint:
 
 - `transcriptions`
 
-File uploads are limited to 1 GB (if you need larger file support, you can write to <a href="https://t.me/RND_RandoM">Support</a>), and the following input file types are supported: `mp3`, `wav`, `mp3`, `m4a`, `flac`, `ogg`, `opus`, `mp4`, `mov`, `avi`, and `mkv`. Furthermore, the API supports sending direct links to the files.
+File uploads are limited to 1 GB (if you need larger file support, you can write to <a href="https://t.me/RND_RandoM">Support</a>), and the following input file types are supported: `mp3`, `wav`, `mp3`, `m4a`, `flac`, `ogg`, `opus`, `mp4`, `mov`, `avi`, and `mkv`. Furthermore, the API supports sending direct links to the files and neural speaker diarization.
 
 ## Transcriptions
 
@@ -32,15 +32,22 @@ with open(file_path, "rb") as audio_file:
         "file": (file_path, audio_file, "audio/mp3"),  # Change MIME type if needed
     }
 
-    response = requests.post(url, headers=headers, files=files)
+    # Or you can pass the "url" parameter and send the direct link to the audio file.
+    data = {
+        "response_format": "json",
+        # "task": "diarize" # if you want to perform speaker diarization
+        # By default, the task is set to "transcribe"
+    }
+
+    response = requests.post(url, headers=headers, files=files, data=data)
 
     transcription = response.json()
     print(transcription)
 ```
 
 ```python OpenAI Python
-# Warning: OpenAI SDK will not support future features of Nexara.
-# Use with caution.
+# Warning: OpenAI SDK does not support diarization.
+
 from openai import OpenAI
 
 client = OpenAI(
@@ -481,3 +488,93 @@ The API supports the following output formats:
 - **`verbose_json`:** Returns a detailed JSON object containing the text, language, duration, and potentially segment and word-level timestamps (if requested via `timestamp_granularities[]`).
 - **`srt`:** Returns the transcription formatted as an SRT subtitle file.
 - **`vtt`:** Returns the transcription formatted as a WebVTT subtitle file.
+
+## Speaker Diarization
+
+Nexara API supports neural speaker diarization. This feature identifies different speakers in an audio file and attributes transcribed segments to each one. To get started, simply set the `task` parameter to `"diarize"` in your API request.
+
+Furthermore, you can pass the `num_speakers` parameter to specify the number of speakers you expect in the audio file. Note that this parameter does not guarantee the correct number of speakers but can guide the model.
+
+The model also supports three diarization settings:
+
+- `general`: Default setting for general use.
+- `meeting`: Optimized for meetings.
+- `telephonic`: Optimized for telephonic conversations.
+
+Note that performing speaker diarization is more computationally intensive than just transcribing an audio file, so the delay for the response will be longer.
+
+<CodeGroup>
+
+```python Python requests
+import requests
+
+url = "https://api.nexara.ru/api/v1/audio/transcriptions"
+api_key = "NEXARA_API_KEY"  # Replace with your full API key
+
+headers = {
+    "Authorization": f"Bearer {api_key}",
+}
+
+file_path = "audio/example.mp3"
+
+with open(file_path, "rb") as audio_file:
+    files = {
+        "file": (file_path, audio_file, "audio/mp3"),  # Change MIME type if needed
+    }
+
+    # Or you can pass the "url" parameter and send the direct link to the audio file.
+    data = {
+        "task": "diarize",
+        # "num_speakers": 2,
+        # "diarization_setting": "telephonic"
+    }
+
+    response = requests.post(url, headers=headers, files=files, data=data)
+
+    transcription = response.json()
+    print(transcription)
+```
+
+```curl cURL
+curl --request POST \
+  --url https://api.nexara.ru/api/v1/audio/transcriptions \
+  --header 'Authorization: Bearer NEXARA_API_KEY' \
+  --header 'Content-Type: multipart/form-data' \
+  --form task="diarize" \
+  --form file="@example.mp3"
+```
+
+</CodeGroup>
+
+When you request diarization, the API will always return a JSON response. This response includes a `segments` array. Each object within this array will have a speaker field (e.g., "speaker_0", "speaker_1") identifying who spoke during that specific audio segment, along with their `start` time, `end` time, and the `text` they spoke.
+
+The output will always be in the following format, no matter the `response_format` setting:
+
+```
+{
+    "task": "diarize",
+    "language": "en",
+    "duration": 9.12,
+    "text": "The beach was a popular spot on a hot summer day. People were swimming in the ocean, building sandcastles, and playing beach volleyball.",
+    "segments": [
+        {
+            "speaker": "speaker_0",
+            "start": 0.00,
+            "end": 5.00,
+            "text": "The beach was a popular spot on a hot summer day."
+        },
+        {
+            "speaker": "speaker_1",
+            "start": 5.00,
+            "end": 9.12,
+            "text": "People were swimming in the ocean, building sandcastles, and playing beach volleyball."
+        }
+    ]
+}
+```
+
+<Info>
+  Note that Nexara doesn't support channel diarization. This means that the API
+  will ignore channel information and identify speakers based on the audio
+  content alone.
+</Info>

@@ -36,5 +36,6 @@ Here's a quick guide to integrate the Nexara Transcription API with n8n:
 
     - To add other API parameters (like `language`, or `response_format`), add more parameters under **Body Parameters**, typically using `String` as the **Parameter Type**. Like this: ![Configure Body Parameters](/images/other.jpg)
     - Make sure a node _before_ this HTTP Request node reads your audio file and makes its binary data available (usually in the `data` field). Or just send the link to the audio file using the `url` parameter.
+    - If you want to perform speaker diarization, you can add the `task` parameter to the API request and set it to `diarize`.
 
     For details on all available API parameters, please refer to the [API Documentation](/en/api-reference/endpoint/transcription).

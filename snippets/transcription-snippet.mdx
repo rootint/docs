@@ -27,6 +27,7 @@ with open(file_path, "rb") as audio_file:
     # Or you can pass the "url" parameter and send the direct link to the audio file.
     data = {
         "response_format": "verbose_json",
+        # "task": "diarize" # if you want to perform speaker diarization
     }
 
     response = requests.post(url, headers=headers, files=files, data=data)
@@ -36,8 +37,7 @@ with open(file_path, "rb") as audio_file:
 ```
 
 ```python OpenAI Python
-# Warning: OpenAI SDK will not support future features of Nexara.
-# Use with caution.
+# Warning: OpenAI SDK does not support diarization and URLs.
 from openai import OpenAI
 
 client = OpenAI(
@@ -57,11 +57,13 @@ print(transcription)
 ```
 
 ```bash cURL
+# Example with speaker diarization
 curl --request POST \
   --url https://api.nexara.ru/api/v1/audio/transcriptions \
   --header "Authorization: Bearer $NEXARA_API_KEY" \
   --header "Content-Type: multipart/form-data" \
-  --form url="https://upload.wikimedia.org/wikipedia/commons/a/a1/Gettysburg_by_Britton.ogg"
+  --form url="https://upload.wikimedia.org/wikipedia/commons/a/a1/Gettysburg_by_Britton.ogg" \
+  --form task="diarize"
 ```
 
 </RequestExample>

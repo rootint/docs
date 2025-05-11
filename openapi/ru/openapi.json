@@ -123,7 +123,7 @@
                     "Аудио"
                 ],
                 "summary": "Транскрибирует аудио",
-                "description": "Транскрибирует аудио из предоставленного аудиофайла.",
+                "description": "Транскрибирует аудио из предоставленного аудиофайла. Также поддерживает диаризацию.",
                 "operationId": "create_transcription_audio_transcriptions_post",
                 "requestBody": {
                     "required": true,
@@ -189,6 +189,28 @@
                                     "json_example": {
                                         "value": {
                                             "text": "Привет, мир."
+                                        }
+                                    },
+                                    "diarization_example": {
+                                        "value": {
+                                            "task": "diarize",
+                                            "language": "en",
+                                            "duration": 9.12,
+                                            "text": "The beach was a popular spot on a hot summer day. People were swimming in the ocean, building sandcastles, and playing beach volleyball.",
+                                            "segments": [
+                                                {
+                                                    "speaker": "speaker_0",
+                                                    "start": 0.00,
+                                                    "end": 5.00,
+                                                    "text": "The beach was a popular spot on a hot summer day."
+                                                },
+                                                {
+                                                    "speaker": "speaker_1",
+                                                    "start": 5.00,
+                                                    "end": 9.12,
+                                                    "text": "People were swimming in the ocean, building sandcastles, and playing beach volleyball."
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -354,6 +376,16 @@
                         "nullable": true,
                         "description": "Ссылка на аудиофайл, в одном из поддерживаемых форматов. Эта опция не поддерживается OpenAI SDK. Обязательно должен быть отправлен `file` или  `url` в запросе."
                     },
+                    "task": {
+                        "type": "string",
+                        "description": "Задача для выполнения. В настоящее время поддерживается только 'transcribe' или 'diarize'. `transcribe` - транскрибация аудио, `diarize` - разделение аудио на сегменты по говорящим.",
+                        "enum": [
+                            "transcribe",
+                            "diarize"
+                        ],
+                        "default": "transcribe",
+                        "example": "transcribe"
+                    },
                     "model": {
                         "type": "string",
                         "description": "Идентификатор используемой модели. В настоящее время доступна только `whisper-1`.",
@@ -368,7 +400,7 @@
                     },
                     "response_format": {
                         "type": "string",
-                        "description": "Формат вывода транскрипции. Форматы `srt` и `vtt` возвращают готовые к использованию форматированные субтитры.",
+                        "description": "Формат вывода транскрипции. Форматы `srt` и `vtt` возвращают готовые к использованию форматированные субтитры. Если `task` - `diarize`, то всегда будет возвращаться JSON объект. Пример смотрите в правой колонке.",
                         "enum": [
                             "json",
                             "text",
@@ -379,14 +411,23 @@
                         "default": "json",
                         "example": "verbose_json"
                     },
-                    "task": {
+                    "num_speakers": {
+                        "type": "number",
+                        "description": "Количество говорящих в аудио. Если не указано, то будет определено автоматически. Обратите внимание, что этот параметр не гарантирует правильное количество говорящих, но может помочь модели. Параметр игнорируется, если `task` - `transcribe`.",
+                        "default": null,
+                        "nullable": true,
+                        "example": 2
+                    },
+                    "diarization_setting": {
                         "type": "string",
-                        "description": "Задача для выполнения. В настоящее время поддерживается только 'transcribe'.",
+                        "description": "Настройки для модели диаризации. `general` - для большинства случаев, `meeting` - для встреч, `telephonic` - для телефонных разговоров. Параметр игнорируется, если `task` - `transcribe`.",
                         "enum": [
-                            "transcribe"
+                            "general",
+                            "meeting",
+                            "telephonic"
                         ],
-                        "default": "transcribe",
-                        "example": "transcribe"
+                        "default": "general",
+                        "example": "telephonic"
                     },
                     "timestamp_granularities[]": {
                         "type": "string",
