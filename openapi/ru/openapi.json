@@ -117,6 +117,50 @@
                 }
             }
         },
+        "/billing/balance": {
+            "get": {
+                "tags": [
+                    "Billing"
+                ],
+                "summary": "Получить баланс",
+                "description": "Получить текущий баланс, цену за минуту и валюту пользователя.",
+                "operationId": "getBalance",
+                "responses": {
+                    "200": {
+                        "description": "Детализация баланса пользователя.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "balance": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "description": "Текущий баланс на счете.",
+                                            "example": 100.00
+                                        },
+                                        "rate_per_min": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "description": "Цена за минуту транскрибации.",
+                                            "example": 0.36
+                                        },
+                                        "currency": {
+                                            "type": "string",
+                                            "description": "Валюта пользователя.",
+                                            "example": "RUB"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "API ключ не найден."
+                    }
+                }
+            }
+        },
         "/audio/transcriptions": {
             "post": {
                 "tags": [

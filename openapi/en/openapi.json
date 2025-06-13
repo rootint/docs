@@ -117,6 +117,50 @@
                 }
             }
         },
+        "/billing/balance": {
+            "get": {
+                "tags": [
+                    "Billing"
+                ],
+                "summary": "Retrieve your balance",
+                "description": "Fetches the current account balance, rate per minute, and currency for the authenticated user.",
+                "operationId": "getBalance",
+                "responses": {
+                    "200": {
+                        "description": "Your balance details.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "balance": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "description": "The current balance on the account.",
+                                            "example": 100
+                                        },
+                                        "rate_per_min": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "description": "Your personal transcription rate per minute.",
+                                            "example": 0.0048
+                                        },
+                                        "currency": {
+                                            "type": "string",
+                                            "description": "The currency of the balance and rate.",
+                                            "example": "EUR"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "API key not found."
+                    }
+                }
+            }
+        },
         "/audio/transcriptions": {
             "post": {
                 "tags": [

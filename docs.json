@@ -58,7 +58,8 @@
                                 "pages": [
                                     "en/api-reference/endpoint/transcription",
                                     "en/api-reference/endpoint/models",
-                                    "en/api-reference/endpoint/retrieve_model"
+                                    "en/api-reference/endpoint/retrieve_model",
+                                    "en/api-reference/endpoint/get_balance"
                                 ]
                             }
                         ]
@@ -96,7 +97,8 @@
                                 "pages": [
                                     "ru/api-reference/endpoint/transcription",
                                     "ru/api-reference/endpoint/models",
-                                    "ru/api-reference/endpoint/retrieve_model"
+                                    "ru/api-reference/endpoint/retrieve_model",
+                                    "ru/api-reference/endpoint/get_balance"
                                 ]
                             }
                         ]

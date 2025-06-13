@@ -489,6 +489,8 @@ The API supports the following output formats:
 - **`srt`:** Returns the transcription formatted as an SRT subtitle file.
 - **`vtt`:** Returns the transcription formatted as a WebVTT subtitle file.
 
+<Warning>When getting an answer in the subtitle format (`srt` or `vtt`), do **not** use `response.text` if using python's `request` library. Use `response.json` instead.</Warning>
+
 ## Speaker Diarization
 
 Nexara API supports neural speaker diarization. This feature identifies different speakers in an audio file and attributes transcribed segments to each one. To get started, simply set the `task` parameter to `"diarize"` in your API request.

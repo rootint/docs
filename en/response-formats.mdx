@@ -12,3 +12,5 @@ The API supports the following output formats:
 - **`verbose_json`:** Returns a detailed JSON object containing the text, language, duration, and potentially segment and word-level timestamps (if requested via `timestamp_granularities[]`).
 - **`srt`:** Returns the transcription formatted as an SRT subtitle file.
 - **`vtt`:** Returns the transcription formatted as a WebVTT subtitle file.
+
+<Warning>When getting an answer in the subtitle format (`srt` or `vtt`), do **not** use `response.text` if using python's `request` library. Use `response.json` instead.</Warning>
